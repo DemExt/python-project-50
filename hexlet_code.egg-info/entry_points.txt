@@ -1,0 +1,2 @@
+[console_scripts]
+gendiff = gendiff.scripts.gendiff:main
