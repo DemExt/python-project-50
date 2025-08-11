@@ -1,17 +1,20 @@
 import argparse
 import json
-#import yaml не нужно
+
+# import yaml не нужно
 import os
+
 
 def read_file(filepath):
     _, ext = os.path.splitext(filepath)
     with open(filepath, 'r', encoding='utf-8') as f:
         if ext == '.json':
             return json.load(f)
-        #elif ext in ['.yml', '.yaml']:
+        # elif ext in ['.yml', '.yaml']:
            # return yaml.safe_load(f)
         else:
             raise ValueError(f"Unsupported file extension: {ext}")
+
 
 def generate_diff(data1, data2, format='stylish'):
     """
@@ -64,7 +67,6 @@ def generate_diff(data1, data2, format='stylish'):
 
 
 def main():
-    import argparse
     parser = argparse.ArgumentParser(
         description='Генератор диффов'
     )
@@ -80,8 +82,8 @@ def main():
 
     args = parser.parse_args()
 
-    #print("Файлы:", args.first_file, args.second_file)
-    #print("Формат вывода:", args.format)
+    # print("Файлы:", args.first_file, args.second_file)
+    # print("Формат вывода:", args.format)
 
     data1 = read_file(args.first_file)
     data2 = read_file(args.second_file)
@@ -89,5 +91,6 @@ def main():
     diff = generate_diff(data1, data2, format=args.format)
     print(diff)
     
+
 if __name__ == '__main__':
     main()
