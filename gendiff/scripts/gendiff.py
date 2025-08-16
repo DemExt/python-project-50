@@ -1,7 +1,7 @@
 import argparse
 import json
 
-# import yaml не нужно
+import yaml
 import os
 
 
@@ -10,8 +10,8 @@ def read_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         if ext == '.json':
             return json.load(f)
-        # elif ext in ['.yml', '.yaml']:
-           # return yaml.safe_load(f)
+        elif ext in ['.yml', '.yaml']:
+            return yaml.safe_load(f)
         else:
             raise ValueError(f"Unsupported file extension: {ext}")
 
