@@ -8,16 +8,17 @@ def compare_yml_files(file_path1, file_path2):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read().strip()
             if not content:
-                # Пустой файл — считаем его равным пустому словарю
                 return {}
-            return yml.loads(content)
-    data1 = load_yml_or_empty(file_path1)
-    data2 = load_yml_or_empty(file_path2)
+            return yaml.safe_load(content)
+    try:
+        data1 = load_yml_or_empty(file_path1)
+        data2 = load_yml_or_empty(file_path2)
+    except yaml.YAMLError as e:
+        raise
     return data1 == data2
 
-class TestCompareJsonFiles(unittest.TestCase):
+class TestCompareYmlFiles(unittest.TestCase):
     def setUp(self):
-        # Создаем временные файлы для тестов
         self.temp_dir = tempfile.TemporaryDirectory()
         self.file1_path = os.path.join(self.temp_dir.name, "file.yml")
         self.file2_path = os.path.join(self.temp_dir.name, "file2.yml")
@@ -30,13 +31,13 @@ class TestCompareJsonFiles(unittest.TestCase):
         # Создаем файлы с содержимым
         content = {"name": "Alice", "age": 30}
         with open(self.file1_path, 'w', encoding='utf-8') as f:
-            yml.dump(content, f)
+            yaml.dump(content, f)
         with open(self.file2_path, 'w', encoding='utf-8') as f:
-            yml.dump(content, f)
+            yaml.dump(content, f)
 
         content_diff = {"name": "Bob", "age": 25}
         with open(self.file3_path, 'w', encoding='utf-8') as f:
-            yml.dump(content_diff, f)
+            yaml.dump(content_diff, f)
 
         # Пустые файлы
         with open(self.file_empty1, 'w', encoding='utf-8') as f:
@@ -44,15 +45,15 @@ class TestCompareJsonFiles(unittest.TestCase):
         with open(self.file_empty2, 'w', encoding='utf-8') as f:
             pass
 
-        # Некорректный JSON
+        # Некорректный YAML (невалидный)
         with open(self.file_invalid, 'w', encoding='utf-8') as f:
-            f.write("{ invalid json }")
-        # Корректный JSON для сравнения
+            f.write("!!! this is not valid yaml !!!")  # Гарантированно вызовет ошибку при парсинге
+
+        # Корректный YAML для сравнения
         with open(self.file_valid, 'w', encoding='utf-8') as f:
-            yml.dump({"key": "value"}, f)
+            yaml.dump({"key": "value"}, f)
 
     def tearDown(self):
-        # Удаляем временные файлы и директорию
         self.temp_dir.cleanup()
 
     def test_compare_identical_files(self):
@@ -68,7 +69,7 @@ class TestCompareJsonFiles(unittest.TestCase):
         self.assertTrue(result)
 
     def test_compare_with_invalid_yml_raises_exception(self):
-        with self.assertRaises(yml.JSONDecodeError):
+        with self.assertRaises(yaml.YAMLError):
             compare_yml_files(self.file_invalid, self.file_valid)
 
 if __name__ == '__main__':

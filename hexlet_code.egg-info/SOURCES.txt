@@ -1,6 +1,8 @@
 README.md
 pyproject.toml
+gendiff/parser.py
 gendiff/test_compare_json.py
+gendiff/test_yaml.py
 gendiff/scripts/gendiff.py
 hexlet_code.egg-info/PKG-INFO
 hexlet_code.egg-info/SOURCES.txt

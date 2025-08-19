@@ -1,9 +1,7 @@
 import argparse
 import json
-
-import yaml
 import os
-
+import yaml
 
 def read_file(filepath):
     _, ext = os.path.splitext(filepath)
@@ -15,82 +13,109 @@ def read_file(filepath):
         else:
             raise ValueError(f"Unsupported file extension: {ext}")
 
+def get_keys(data1, data2):
+    return sorted(set(data1.keys() or {}) | set(data2.keys() or {}))
 
-def generate_diff(data1, data2, format='stylish'):
-    """
-    Генерирует строку с различиями между двумя словарями.
-    """
-    def get_keys():
-        return sorted(data1.keys() | data2.keys())
+def build_diff(data1, data2):
+    diff = []
 
-    def build_diff():
-        diff_lines = []
+    all_keys = get_keys(data1 or {}, data2 or {})
 
-        for key in get_keys():
-            if key not in data1:
-                # Ключ добавлен во второй файл
-                diff_lines.append(f"  + {key}: {format_value(data2[key])}")
-            elif key not in data2:
-                # Ключ удалён из второго файла
-                diff_lines.append(f"  - {key}: {format_value(data1[key])}")
-            else:
-                # Ключ есть в обоих файлах
-                if data1[key] == data2[key]:
-                    # Значения совпадают
-                    diff_lines.append(f"    {key}: {format_value(data1[key])}")
-                else:
-                    # Значения отличаются
-                    diff_lines.append(f"  - {key}: {format_value(data1[key])}")
-                    diff_lines.append(f"  + {key}: {format_value(data2[key])}")
+    for key in all_keys:
+        val1 = data1.get(key) if data1 else None
+        val2 = data2.get(key) if data2 else None
 
-        return diff_lines
-
-    def format_value(value):
-        if isinstance(value, dict):
-            lines = ['{']
-            for k, v in value.items():
-                lines.append(f"    {k}: {format_value(v)}")
-            lines.append('  }')
-            return '\n'.join(lines)
-        elif isinstance(value, bool):
-            return str(value).lower()
-        elif value is None:
-            return 'null'
+        if key not in data1:
+            diff.append({'key': key, 'status': 'added', 'value': val2})
+        elif key not in data2:
+            diff.append({'key': key, 'status': 'removed', 'value': val1})
         else:
-            return str(value)
+            if val1 == val2:
+                diff.append({'key': key, 'status': 'unchanged', 'value': val1})
+            else:
+                diff.append({'key': key, 'status': 'changed', 'old_value': val1, 'new_value': val2})
+    return diff
 
-    lines = build_diff()
+def format_stylish(diff_lines):
     result = ['{']
-    result.extend(lines)
+    result.extend(diff_lines)
     result.append('}')
     return '\n'.join(result)
 
+def format_plain(diff):
+    lines = []
+    for change in diff:
+        key = change['key']
+        status = change['status']
+        if status == 'added':
+            lines.append(f"  + {key}: {format_value(change['value'])}")
+        elif status == 'removed':
+            lines.append(f"  - {key}: {format_value(change['value'])}")
+        elif status == 'changed':
+            lines.append(f"  - {key}: {format_value(change['old_value'])}")
+            lines.append(f"  + {key}: {format_value(change['new_value'])}")
+        # unchanged не выводим
+    return '\n'.join(lines)
+
+def format_json(diff):
+    return json.dumps(diff, indent=4)
+
+def format_value(value):
+    if isinstance(value, dict):
+        # Можно оставить как есть или форматировать по желанию
+        return json.dumps(value)
+    elif isinstance(value, bool):
+        return str(value).lower()
+    elif value is None:
+        return 'null'
+    else:
+        return str(value)
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Генератор диффов'
-    )
+    parser = argparse.ArgumentParser(description='Генератор диффов')
     
     parser.add_argument('first_file', help='Первый файл для сравнения')
     parser.add_argument('second_file', help='Второй файл для сравнения')
+    
     parser.add_argument(
         '-f', '--format',
         dest='format',
         default='stylish',
-        help='set format of output'
+        choices=['stylish', 'plain', 'json'],
+        help='выберите формат вывода'
     )
 
     args = parser.parse_args()
 
-    # print("Файлы:", args.first_file, args.second_file)
-    # print("Формат вывода:", args.format)
-
     data1 = read_file(args.first_file)
     data2 = read_file(args.second_file)
 
-    diff = generate_diff(data1, data2, format=args.format)
-    print(diff)
+    diff = build_diff(data1 or {}, data2 or {})
+
+    if args.format == 'stylish':
+        # Форматируем в стильный вывод
+        diff_lines = []
+        for item in diff:
+            key = item['key']
+            status = item['status']
+            if status == 'added':
+                diff_lines.append(f"  + {key}: {format_value(item['value'])}")
+            elif status == 'removed':
+                diff_lines.append(f"  - {key}: {format_value(item['value'])}")
+            elif status == 'unchanged':
+                diff_lines.append(f"      {key}: {format_value(item['value'])}")
+            elif status == 'changed':
+                diff_lines.append(f"  - {key}: {format_value(item['old_value'])}")
+                diff_lines.append(f"  + {key}: {format_value(item['new_value'])}")
+        
+        print(format_stylish(diff_lines))
     
+    elif args.format == 'plain':
+        print(format_plain(diff))
+    
+    elif args.format == 'json':
+        print(format_json(diff))
+
 
 if __name__ == '__main__':
     main()
