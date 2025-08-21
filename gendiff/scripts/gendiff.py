@@ -14,12 +14,12 @@ def read_file(filepath):
             raise ValueError(f"Unsupported file extension: {ext}")
 
 def get_keys(data1, data2):
-    return sorted(set(data1.keys() or {}) | set(data2.keys() or {}))
+    return sorted(set((data1 or {}).keys()) | set((data2 or {}).keys()))
 
 def build_diff(data1, data2):
     diff = []
 
-    all_keys = get_keys(data1 or {}, data2 or {})
+    all_keys = get_keys(data1, data2)
 
     for key in all_keys:
         val1 = data1.get(key) if data1 else None
@@ -30,39 +30,17 @@ def build_diff(data1, data2):
         elif key not in data2:
             diff.append({'key': key, 'status': 'removed', 'value': val1})
         else:
-            if val1 == val2:
+            if isinstance(val1, dict) and isinstance(val2, dict):
+                nested_diff = build_diff(val1, val2)
+                diff.append({'key': key, 'status': 'nested', 'children': nested_diff})
+            elif val1 == val2:
                 diff.append({'key': key, 'status': 'unchanged', 'value': val1})
             else:
                 diff.append({'key': key, 'status': 'changed', 'old_value': val1, 'new_value': val2})
     return diff
 
-def format_stylish(diff_lines):
-    result = ['{']
-    result.extend(diff_lines)
-    result.append('}')
-    return '\n'.join(result)
-
-def format_plain(diff):
-    lines = []
-    for change in diff:
-        key = change['key']
-        status = change['status']
-        if status == 'added':
-            lines.append(f"  + {key}: {format_value(change['value'])}")
-        elif status == 'removed':
-            lines.append(f"  - {key}: {format_value(change['value'])}")
-        elif status == 'changed':
-            lines.append(f"  - {key}: {format_value(change['old_value'])}")
-            lines.append(f"  + {key}: {format_value(change['new_value'])}")
-        # unchanged не выводим
-    return '\n'.join(lines)
-
-def format_json(diff):
-    return json.dumps(diff, indent=4)
-
 def format_value(value):
     if isinstance(value, dict):
-        # Можно оставить как есть или форматировать по желанию
         return json.dumps(value)
     elif isinstance(value, bool):
         return str(value).lower()
@@ -70,6 +48,44 @@ def format_value(value):
         return 'null'
     else:
         return str(value)
+
+def format_stylish(diff, depth=0):
+    lines = []
+    indent = "  " * depth
+    for item in diff:
+        key = item['key']
+        status = item['status']
+        if status == 'nested':
+            lines.append(f"{indent}  {key}: {format_stylish(item['children'], depth + 1)}")
+        elif status == 'added':
+            lines.append(f"{indent}+ {key}: {format_value(item['value'])}")
+        elif status == 'removed':
+            lines.append(f"{indent}- {key}: {format_value(item['value'])}")
+        elif status == 'unchanged':
+            lines.append(f"{indent}  {key}: {format_value(item['value'])}")
+        elif status == 'changed':
+            lines.append(f"{indent}- {key}: {format_value(item['old_value'])}")
+            lines.append(f"{indent}+ {key}: {format_value(item['new_value'])}")
+    return '{\n' + '\n'.join(lines) + '\n' + indent + '}'
+
+def format_plain(diff):
+    lines = []
+    for change in diff:
+        key = change['key']
+        status = change['status']
+        if status == 'added':
+            lines.append(f"Property '{key}' was added with value: {format_value(change['value'])}")
+        elif status == 'removed':
+            lines.append(f"Property '{key}' was removed")
+        elif status == 'changed':
+            old_val = format_value(change['old_value'])
+            new_val = format_value(change['new_value'])
+            lines.append(f"Property '{key}' was updated. From {old_val} to {new_val}")
+        # unchanged не выводим
+    return '\n'.join(lines)
+
+def format_json(diff):
+    return json.dumps(diff, indent=4)
 
 def main():
     parser = argparse.ArgumentParser(description='Генератор диффов')
@@ -93,29 +109,11 @@ def main():
     diff = build_diff(data1 or {}, data2 or {})
 
     if args.format == 'stylish':
-        # Форматируем в стильный вывод
-        diff_lines = []
-        for item in diff:
-            key = item['key']
-            status = item['status']
-            if status == 'added':
-                diff_lines.append(f"  + {key}: {format_value(item['value'])}")
-            elif status == 'removed':
-                diff_lines.append(f"  - {key}: {format_value(item['value'])}")
-            elif status == 'unchanged':
-                diff_lines.append(f"      {key}: {format_value(item['value'])}")
-            elif status == 'changed':
-                diff_lines.append(f"  - {key}: {format_value(item['old_value'])}")
-                diff_lines.append(f"  + {key}: {format_value(item['new_value'])}")
-        
-        print(format_stylish(diff_lines))
-    
+        print(format_stylish(diff))
     elif args.format == 'plain':
         print(format_plain(diff))
-    
     elif args.format == 'json':
         print(format_json(diff))
-
 
 if __name__ == '__main__':
     main()

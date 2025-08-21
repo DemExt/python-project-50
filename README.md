@@ -8,3 +8,5 @@ https://asciinema.org/a/IJ1kuvze1yft0VJBpHAAg1Tou шаг 4
 [![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=DemExt_python-project-50)
 
 https://asciinema.org/a/f0MWiHvQLQGQeerhM3CCIWdEv шаг 5
+
+https://asciinema.org/a/cprV1s5mllyvz9D7HOyGcAXg6 шаг 7
