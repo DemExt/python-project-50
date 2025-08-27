@@ -1,12 +1,12 @@
 import argparse
 from diff_generator import (
     read_file,
-    build_diff,
+    #build_diff,
     format_stylish,
     format_plain,
     format_json
 )
-
+from diff_builder import build_diff
 def main():
     parser = argparse.ArgumentParser(description='Генератор диффов')
     
