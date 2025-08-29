@@ -60,14 +60,19 @@ def format_stylish(diff, depth=0):
         if status == 'nested':
             lines.append(f"{indent}  {key}: {format_stylish(item['children'], depth + 1)}")
         elif status == 'added':
-            lines.append(f"{indent}+ {key}: {format_value(item['value'])}")
+            value = item.get('value', '')
+            lines.append(f"{indent}+ {key}: {format_value(value)}")
         elif status == 'removed':
-            lines.append(f"{indent}- {key}: {format_value(item['value'])}")
+            value = item.get('value', '')
+            lines.append(f"{indent}- {key}: {format_value(value)}")
         elif status == 'unchanged':
-            lines.append(f"{indent}  {key}: {format_value(item['value'])}")
+            value = item.get('value', '')
+            lines.append(f"{indent}  {key}: {format_value(value)}")
         elif status == 'changed':
-            lines.append(f"{indent}- {key}: {format_value(item['old_value'])}")
-            lines.append(f"{indent}+ {key}: {format_value(item['new_value'])}")
+            old_value = item.get('old_value', '')
+            new_value = item.get('new_value', '')
+            lines.append(f"{indent}- {key}: {format_value(old_value)}")
+            lines.append(f"{indent}+ {key}: {format_value(new_value)}")
     # Обертка в фигурные скобки с правильными отступами
     opening_brace = '{'
     closing_brace = indent + '}'
@@ -75,7 +80,7 @@ def format_stylish(diff, depth=0):
         return opening_brace + '\n' + '\n'.join(lines) + '\n' + closing_brace
     else:
         return '{\n' + '\n'.join(lines) + '\n' + indent + '}'
-
+    
 def format_plain(diff):
     lines = []
 
