@@ -1,7 +1,9 @@
 # parser.py
 import json
-import yaml
 import os
+
+import yaml
+
 
 def read_file(filepath):
     _, ext = os.path.splitext(filepath)

@@ -10,6 +10,7 @@ def format_value(value):
     else:
         return str(value)
 
+
 def format_plain(node_list):
     lines = []
 

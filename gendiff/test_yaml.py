@@ -1,7 +1,9 @@
-import yaml
 import os
-import unittest
 import tempfile
+import unittest
+
+import yaml
+
 
 def compare_yml_files(file_path1, file_path2):
     def load_yml_or_empty(file_path):
@@ -13,9 +15,10 @@ def compare_yml_files(file_path1, file_path2):
     try:
         data1 = load_yml_or_empty(file_path1)
         data2 = load_yml_or_empty(file_path2)
-    except yaml.YAMLError as e:
+    except yaml.YAMLError:
         raise
     return data1 == data2
+
 
 class TestCompareYmlFiles(unittest.TestCase):
     def setUp(self):
@@ -71,6 +74,7 @@ class TestCompareYmlFiles(unittest.TestCase):
     def test_compare_with_invalid_yml_raises_exception(self):
         with self.assertRaises(yaml.YAMLError):
             compare_yml_files(self.file_invalid, self.file_valid)
+
 
 if __name__ == '__main__':
     unittest.main()

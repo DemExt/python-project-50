@@ -1,8 +1,9 @@
-#import pytest
+# import pytest
 import json
 import os
-import unittest
 import tempfile
+import unittest
+
 
 def compare_json_files(file_path1, file_path2):
     def load_json_or_empty(file_path):
@@ -15,6 +16,7 @@ def compare_json_files(file_path1, file_path2):
     data1 = load_json_or_empty(file_path1)
     data2 = load_json_or_empty(file_path2)
     return data1 == data2
+
 
 class TestCompareJsonFiles(unittest.TestCase):
     def setUp(self):
@@ -71,6 +73,7 @@ class TestCompareJsonFiles(unittest.TestCase):
     def test_compare_with_invalid_json_raises_exception(self):
         with self.assertRaises(json.JSONDecodeError):
             compare_json_files(self.file_invalid, self.file_valid)
+
 
 if __name__ == '__main__':
     unittest.main()

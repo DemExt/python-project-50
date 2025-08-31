@@ -1,7 +1,8 @@
 import json
 import os
+
 from gendiff.diff_builder import build_diff
-from gendiff.formatters import plain, stylish
+
 
 def get_data(file_path):
     with open(file_path) as f:
@@ -11,6 +12,7 @@ def get_data(file_path):
             return json.loads(content)
         # Можно добавить поддержку yaml и других форматов при необходимости
         raise ValueError(f'Unsupported file extension: {ext}')
+
 
 def generate_diff(file_path1, file_path2, format_name='stylish'):
     data1 = get_data(file_path1)

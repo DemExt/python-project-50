@@ -1,6 +1,8 @@
 import json
 import os
+
 import yaml
+
 
 def read_file(filepath):
     _, ext = os.path.splitext(filepath)
@@ -12,8 +14,10 @@ def read_file(filepath):
         else:
             raise ValueError(f"Unsupported file extension: {ext}")
 
+
 def get_keys(data1, data2):
     return sorted(set((data1 or {}).keys()) | set((data2 or {}).keys()))
+
 
 def build_diff(data1, data2):
     diff = []
@@ -39,6 +43,7 @@ def build_diff(data1, data2):
                 diff.append({'key': key, 'status': 'changed', 'old_value': val1, 'new_value': val2})
     return diff
 
+
 def format_value(value):
     if isinstance(value, dict):
         return '[complex value]'
@@ -50,6 +55,7 @@ def format_value(value):
         return f"'{value}'"
     else:
         return str(value)
+
 
 def format_stylish(diff, depth=0):
     lines = []
@@ -81,6 +87,7 @@ def format_stylish(diff, depth=0):
     else:
         return '{\n' + '\n'.join(lines) + '\n' + indent + '}'
     
+
 def format_plain(diff):
     lines = []
 
@@ -104,6 +111,7 @@ def format_plain(diff):
 
     recurse(diff)
     return '\n'.join(lines)
+
 
 def format_json(diff):
     return json.dumps(diff, indent=4)

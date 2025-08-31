@@ -1,11 +1,13 @@
 import argparse
+
 from diff_generator import (
-    read_file,
     build_diff,
-    format_stylish,
+    format_json,
     format_plain,
-    format_json
+    format_stylish,
+    read_file,
 )
+
 
 def main():
     parser = argparse.ArgumentParser(description='Генератор диффов')
@@ -34,6 +36,7 @@ def main():
         print(format_plain(diff))
     elif args.format == 'json':
         print(format_json(diff))
+
 
 if __name__ == '__main__':
     main()
