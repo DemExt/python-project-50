@@ -12,8 +12,8 @@ check:
 	ruff check
 
 test-coverage:
-	pip install --quiet --upgrade pytest pytest-cov
-	uv run pytest --cov=hexlet_python_package_50 --cov-report xml
+	pip install --quiet --upgrade pytest pytest-cov pyyaml
+	uv run pytest --cov=gendiff --cov-report xml
 
 lint:
 	pip install --quiet --upgrade ruff
