@@ -60,7 +60,7 @@ class TestCompareYmlFiles(unittest.TestCase):
         with open(self.file_valid, 'w', encoding='utf-8') as f:
             yaml.dump({"key": "value"}, f)
 
-         # YAML файлы для теста generate_diff
+        # YAML файлы для теста generate_diff
         with open(self.file_yaml1, 'w', encoding='utf-8') as f:
             yaml.dump({"name": "Alice", "age": 30}, f)
         with open(self.file_yaml_diff, 'w', encoding='utf-8') as f:
