@@ -3,6 +3,7 @@ import tempfile
 import unittest
 
 import yaml
+
 from gendiff.generate_diff import generate_diff
 
 
