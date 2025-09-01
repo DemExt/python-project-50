@@ -1,8 +1,9 @@
-#import pytest
+# import pytest
 import json
 import os
 import tempfile
 import unittest
+
 from generate_diff import generate_diff
 
 
@@ -82,6 +83,7 @@ class TestCompareJsonFiles(unittest.TestCase):
         }, indent=4)
         result = generate_diff(self.file1_path, self.file3_path, format_name='json')
         self.assertEqual(json.loads(result), json.loads(expected_output))
+
 
 if __name__ == '__main__':
     unittest.main()

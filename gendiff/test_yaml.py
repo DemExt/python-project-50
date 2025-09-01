@@ -5,6 +5,7 @@ import unittest
 import yaml
 from generate_diff import generate_diff
 
+
 def compare_yml_files(file_path1, file_path2):
     def load_yml_or_empty(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:

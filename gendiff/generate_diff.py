@@ -1,6 +1,8 @@
 import json
 import os
 
+import yaml
+
 from gendiff.diff_builder import build_diff
 
 
@@ -10,7 +12,9 @@ def get_data(file_path):
         ext = os.path.splitext(file_path)[1]
         if ext == '.json':
             return json.loads(content)
-        # Можно добавить поддержку yaml и других форматов при необходимости
+        elif ext in ('.yml', '.yaml'):
+            return yaml.safe_load(content)
+        
         raise ValueError(f'Unsupported file extension: {ext}')
 
 
