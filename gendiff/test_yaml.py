@@ -32,6 +32,8 @@ class TestCompareYmlFiles(unittest.TestCase):
         self.file_empty2 = os.path.join(self.temp_dir.name, "empty2.yml")
         self.file_invalid = os.path.join(self.temp_dir.name, "invalid.yml")
         self.file_valid = os.path.join(self.temp_dir.name, "valid.yml")
+        self.file_yaml1 = os.path.join(self.temp_dir.name, "yaml1.yml")
+        self.file_yaml_diff = os.path.join(self.temp_dir.name, "yaml2.yml")
 
         # Создаем файлы с содержимым
         content = {"name": "Alice", "age": 30}
@@ -57,6 +59,12 @@ class TestCompareYmlFiles(unittest.TestCase):
         # Корректный YAML для сравнения
         with open(self.file_valid, 'w', encoding='utf-8') as f:
             yaml.dump({"key": "value"}, f)
+
+         # YAML файлы для теста generate_diff
+        with open(self.file_yaml1, 'w', encoding='utf-8') as f:
+            yaml.dump({"name": "Alice", "age": 30}, f)
+        with open(self.file_yaml_diff, 'w', encoding='utf-8') as f:
+            yaml.dump({"name": "Bob", "age": 25}, f)
 
     def tearDown(self):
         self.temp_dir.cleanup()
