@@ -3,7 +3,7 @@ import tempfile
 import unittest
 
 import yaml
-
+from generate_diff import generate_diff
 
 def compare_yml_files(file_path1, file_path2):
     def load_yml_or_empty(file_path):
@@ -74,6 +74,25 @@ class TestCompareYmlFiles(unittest.TestCase):
     def test_compare_with_invalid_yml_raises_exception(self):
         with self.assertRaises(yaml.YAMLError):
             compare_yml_files(self.file_invalid, self.file_valid)
+
+    def test_generate_diff_yaml_stylish(self):
+        # Предположим, что стиль по умолчанию — stylish
+        expected_output = """{
+  - name: Alice
+  - age: 30
+  + name: Bob
+  + age: 25
+}"""
+        result = generate_diff(self.file_yaml1, self.file_yaml_diff, format_name='stylish')
+        self.assertEqual(result.strip(), expected_output)
+
+    def test_generate_diff_yaml_plain(self):
+        expected_output = (
+            "Property 'name' was updated. From 'Alice' to 'Bob'\n"
+            "Property 'age' was updated. From 30 to 25"
+        )
+        result = generate_diff(self.file_yaml1, self.file_yaml_diff, format_name='plain')
+        self.assertEqual(result.strip(), expected_output)
 
 
 if __name__ == '__main__':

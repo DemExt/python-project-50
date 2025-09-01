@@ -1,8 +1,9 @@
-# import pytest
+#import pytest
 import json
 import os
 import tempfile
 import unittest
+from generate_diff import generate_diff
 
 
 def compare_json_files(file_path1, file_path2):
@@ -73,7 +74,14 @@ class TestCompareJsonFiles(unittest.TestCase):
     def test_compare_with_invalid_json_raises_exception(self):
         with self.assertRaises(json.JSONDecodeError):
             compare_json_files(self.file_invalid, self.file_valid)
-
+            
+    def test_generate_diff_json(self):
+        expected_output = json.dumps({
+            "name": {"old": "Alice", "new": "Bob"},
+            "age": {"old": 30, "new": 25}
+        }, indent=4)
+        result = generate_diff(self.file1_path, self.file3_path, format_name='json')
+        self.assertEqual(json.loads(result), json.loads(expected_output))
 
 if __name__ == '__main__':
     unittest.main()
