@@ -1,10 +1,10 @@
-# import pytest
+#import pytest
 import json
 import os
 import tempfile
 import unittest
 
-from generate_diff import generate_diff
+from gendiff.generate_diff import generate_diff
 
 
 def compare_json_files(file_path1, file_path2):
