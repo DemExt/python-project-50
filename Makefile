@@ -12,6 +12,7 @@ check:
 	ruff check
 
 test-coverage:
+	pip install --quiet --upgrade pytest pytest-cov
 	uv run pytest --cov=hexlet_python_package_50 --cov-report xml
 
 lint:
