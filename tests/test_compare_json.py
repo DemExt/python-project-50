@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 
-from gendiff.generate_diff import generate_diff
+from gendiff.scripts.generate_diff import generate_diff
 
 
 def compare_json_files(file_path1, file_path2):
@@ -78,8 +78,79 @@ class TestCompareJsonFiles(unittest.TestCase):
             
     def test_generate_diff_json(self):
         expected_output = json.dumps({
-            "name": {"old": "Alice", "new": "Bob"},
-            "age": {"old": 30, "new": 25}
+            "common": {
+                "setting1": {
+                    "status": "unchanged",
+                    "value": "Value 1"
+                },
+                "setting2": {
+                    "status": "changed",
+                    "old_value": 200,
+                    "new_value": 250
+                },
+                "setting3": {
+                    "status": "unchanged",
+                    "value": True
+                },
+                "setting6": {
+                    "status": "nested",
+                    "children": {
+                        "doge": {
+                            "status": "nested",
+                            "children": {
+                                "wow": {
+                                    "status": "changed",
+                                    "old_value": "",
+                                    "new_value": "such"
+                                }
+                            }
+                        },
+                        "key": {
+                            "status": "unchanged",
+                            "value": "value"
+                        }
+                    }
+                }
+            },
+            "group1": {
+                "baz": {
+                    "status": "unchanged",
+                    "value": "bas"
+                },
+                "foo": {
+                    "status": "changed",
+                    "old_value": "bar",
+                    "new_value": "baz"
+                },
+                "nest": {
+                    "status": "unchanged",
+                    "value": {
+                        "key": "value"
+                    }
+                }
+            },
+            "group2": {
+                "abc": {
+                    "status": "unchanged",
+                    "value": 12345
+                },
+                "deep": {
+                    "status": "nested",
+                    "children": {
+                        "id": {
+                            "status": "changed",
+                            "old_value": 45,
+                            "new_value": 50
+                        }
+                    }
+                }
+            },
+            "new_group": {
+                "new_prop": {
+                    "status": "added",
+                    "value": "new_value"
+                }
+            }
         }, indent=4)
         result = generate_diff(self.file1_path, self.file3_path, format_name='json')
         self.assertEqual(json.loads(result), json.loads(expected_output))

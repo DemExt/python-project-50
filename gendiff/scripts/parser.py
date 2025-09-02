@@ -1,7 +1,5 @@
-# parser.py
 import json
 import os
-
 import yaml
 
 

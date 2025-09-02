@@ -4,46 +4,6 @@ import os
 import yaml
 
 
-def read_file(filepath):
-    _, ext = os.path.splitext(filepath)
-    with open(filepath, 'r', encoding='utf-8') as f:
-        if ext == '.json':
-            return json.load(f)
-        elif ext in ['.yml', '.yaml']:
-            return yaml.safe_load(f)
-        else:
-            raise ValueError(f"Unsupported file extension: {ext}")
-
-
-def get_keys(data1, data2):
-    return sorted(set((data1 or {}).keys()) | set((data2 or {}).keys()))
-
-
-def build_diff(data1, data2):
-    diff = []
-
-    all_keys = get_keys(data1, data2)
-
-    for key in all_keys:
-        val1 = data1.get(key) if data1 else None
-        val2 = data2.get(key) if data2 else None
-
-        if key not in data1:
-            diff.append({'key': key, 'status': 'added', 'value': val2})
-        elif key not in data2:
-            diff.append({'key': key, 'status': 'removed', 'value': val1})
-        else:
-            # Обработка вложенных словарей
-            if isinstance(val1, dict) and isinstance(val2, dict):
-                nested_diff = build_diff(val1, val2)
-                diff.append({'key': key, 'status': 'nested', 'children': nested_diff})
-            elif val1 == val2:
-                diff.append({'key': key, 'status': 'unchanged', 'value': val1})
-            else:
-                diff.append({'key': key, 'status': 'changed', 'old_value': val1, 'new_value': val2})
-    return diff
-
-
 def format_value(value):
     if isinstance(value, dict):
         return '[complex value]'

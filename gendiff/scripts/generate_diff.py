@@ -1,9 +1,8 @@
 import json
 import os
-
 import yaml
 
-from gendiff.diff_builder import build_diff
+from diff_builder import build_diff
 
 
 def get_data(file_path):

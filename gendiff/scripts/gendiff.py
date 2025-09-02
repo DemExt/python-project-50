@@ -1,20 +1,11 @@
 import argparse
-
-from diff_generator import (
-    build_diff,
-    format_json,
-    format_plain,
-    format_stylish,
-    read_file,
-)
-
+from diff_builder import read_file, get_all_keys, build_diff
+from diff_generator import format_json, format_plain, format_stylish
 
 def main():
     parser = argparse.ArgumentParser(description='Генератор диффов')
-    
     parser.add_argument('first_file', help='Первый файл для сравнения')
     parser.add_argument('second_file', help='Второй файл для сравнения')
-    
     parser.add_argument(
         '-f', '--format',
         dest='format',
@@ -28,7 +19,9 @@ def main():
     data1 = read_file(args.first_file)
     data2 = read_file(args.second_file)
 
-    diff = build_diff(data1 or {}, data2 or {})
+    all_keys = get_all_keys(data1, data2)
+
+    diff = build_diff(data1 or {}, data2 or {}, all_keys)
 
     if args.format == 'stylish':
         print(format_stylish(diff))
@@ -36,7 +29,6 @@ def main():
         print(format_plain(diff))
     elif args.format == 'json':
         print(format_json(diff))
-
 
 if __name__ == '__main__':
     main()

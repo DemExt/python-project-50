@@ -4,7 +4,7 @@ import unittest
 
 import yaml
 
-from gendiff.generate_diff import generate_diff
+from gendiff.scripts.generate_diff import generate_diff
 
 
 def compare_yml_files(file_path1, file_path2):
@@ -88,11 +88,80 @@ class TestCompareYmlFiles(unittest.TestCase):
     def test_generate_diff_yaml_stylish(self):
         # Предположим, что стиль по умолчанию — stylish
         expected_output = """{
-  - name: Alice
-  - age: 30
-  + name: Bob
-  + age: 25
-}"""
+            "common": {
+                "setting1": {
+                    "status": "unchanged",
+                    "value": "Value 1"
+                },
+                "setting2": {
+                    "status": "changed",
+                    "old_value": 200,
+                    "new_value": 250
+                },
+                "setting3": {
+                    "status": "unchanged",
+                    "value": True
+                },
+                "setting6": {
+                    "status": "nested",
+                    "children": {
+                        "doge": {
+                            "status": "nested",
+                            "children": {
+                                "wow": {
+                                    "status": "changed",
+                                    "old_value": "",
+                                    "new_value": "such"
+                                }
+                            }
+                        },
+                        "key": {
+                            "status": "unchanged",
+                            "value": "value"
+                        }
+                    }
+                }
+            },
+            "group1": {
+                "baz": {
+                    "status": "unchanged",
+                    "value": "bas"
+                },
+                "foo": {
+                    "status": "changed",
+                    "old_value": "bar",
+                    "new_value": "baz"
+                },
+                "nest": {
+                    "status": "unchanged",
+                    "value": {
+                        "key": "value"
+                    }
+                }
+            },
+            "group2": {
+                "abc": {
+                    "status": "unchanged",
+                    "value": 12345
+                },
+                "deep": {
+                    "status": "nested",
+                    "children": {
+                        "id": {
+                            "status": "changed",
+                            "old_value": 45,
+                            "new_value": 50
+                        }
+                    }
+                }
+            },
+            "new_group": {
+                "new_prop": {
+                    "status": "added",
+                    "value": "new_value"
+                }
+            }
+        }"""
         result = generate_diff(self.file_yaml1, self.file_yaml_diff, format_name='stylish')
         self.assertEqual(result.strip(), expected_output)
 

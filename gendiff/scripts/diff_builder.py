@@ -1,7 +1,16 @@
-def build_diff(dict1, dict2):
+import json
+
+def read_file(file_path):
+    with open(file_path, 'r') as f:
+        return json.load(f)
+    
+def get_all_keys(dict1, dict2):
+    return sorted(set(dict1.keys()) | set(dict2.keys()))
+
+
+def build_diff(dict1, dict2, all_keys):
     diff = []
 
-    all_keys = sorted(set(dict1.keys()) | set(dict2.keys()))
     for key in all_keys:
         if key not in dict1:
             # свойство добавлено
@@ -21,8 +30,7 @@ def build_diff(dict1, dict2):
             val1 = dict1[key]
             val2 = dict2[key]
             if isinstance(val1, dict) and isinstance(val2, dict):
-                # сравниваем вложенные словари
-                children = build_diff(val1, val2)
+                children = build_diff(val1, val2, get_all_keys(val1, val2))
                 diff.append({
                     'key': key,
                     'status': 'nested',
