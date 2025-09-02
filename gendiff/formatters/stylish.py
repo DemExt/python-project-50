@@ -1,5 +1,6 @@
 from format import format_value
 
+
 def format_stylish(diff, depth=0):
     lines = []
     indent = "  " * depth

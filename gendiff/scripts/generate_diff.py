@@ -1,7 +1,7 @@
 import json
 import os
-import yaml
 
+import yaml
 from diff_builder import build_diff
 
 

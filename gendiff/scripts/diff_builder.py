@@ -1,9 +1,11 @@
 import json
 
+
 def read_file(file_path):
     with open(file_path, 'r') as f:
         return json.load(f)
     
+
 def get_all_keys(dict1, dict2):
     return sorted(set(dict1.keys()) | set(dict2.keys()))
 

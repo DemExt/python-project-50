@@ -1,7 +1,4 @@
 import json
-import os
-
-import yaml
 
 
 def format_value(value):
