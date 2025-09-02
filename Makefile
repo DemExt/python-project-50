@@ -1,20 +1,22 @@
 install:
-		uv sync
+	uv sync
 
-build:
-		uv build
+run:
+	uv run gendiff	
 
-package-install:
-		uv tool install dist/*.whl		
-
-check:
-	pip install --quiet --upgrade ruff	
-	ruff check
+test:
+	uv run pytest
 
 test-coverage:
-	pip install --quiet --upgrade pytest pytest-cov pyyaml
-	uv run pytest --cov=gendiff --cov-report xml
+	uv run pytest --cov=gendiff --cov-report=xml:coverage.xml
 
 lint:
-	pip install --quiet --upgrade ruff
-	ruff check
+	uv run ruff check gendiff
+
+check: test lint
+
+build:
+	uv build
+
+package-install:
+	uv tool install dist/*.whl		
