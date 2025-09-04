@@ -1,4 +1,4 @@
-from format import format_value
+from .format import format_value
 
 
 def format_plain(node_list):

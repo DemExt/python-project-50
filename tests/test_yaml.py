@@ -87,7 +87,7 @@ class TestCompareYmlFiles(unittest.TestCase):
 
     def test_generate_diff_yaml_stylish(self):
         # Предположим, что стиль по умолчанию — stylish
-        expected_output = """{
+        expected_output = {
             "common": {
                 "setting1": {
                     "status": "unchanged",
@@ -161,7 +161,7 @@ class TestCompareYmlFiles(unittest.TestCase):
                     "value": "new_value"
                 }
             }
-        }"""
+        }
         result = generate_diff(self.file_yaml1, self.file_yaml_diff, format_name='stylish')
         self.assertEqual(result.strip(), expected_output)
 
