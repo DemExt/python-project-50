@@ -55,7 +55,7 @@ def tree_to_obj(diff_tree):
                 'value': node['value']
             }
         else:
-            # если у вас ещё есть какие-то статусы
+            # если есть какие-то другие статусы
             raise ValueError(f'Unknown status in diff tree: {status}')
     return result
 
@@ -65,11 +65,17 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
     all_keys = get_all_keys(data1, data2)
     diff_tree = build_diff(data1, data2, all_keys)
 
-    if format_name in ('json', 'stylish'):
+    if format_name == 'json':
         obj = tree_to_obj(diff_tree)
         return json.dumps(obj, indent=4)
+    elif format_name == 'stylish':
+        from gendiff.formatters import stylish as stylish_formatter
+        return stylish_formatter.format_stylish(diff_tree)
     elif format_name == 'plain':
         from gendiff.formatters import plain as plain_formatter
         return plain_formatter.format_plain(diff_tree)
+    elif format_name in ('yml', 'yaml'):
+        from gendiff.formatters import yaml as yaml_formatter
+        return yaml_formatter.format_yaml(diff_tree)
     else:
         raise ValueError(f'Unknown format: {format_name}')
