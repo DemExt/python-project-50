@@ -1,17 +1,22 @@
 import json
 import os
 import yaml
-from .diff_builder import build_diff
+from .diff_builder import build_diff, get_all_keys
 
 def get_data(file_path):
     with open(file_path) as f:
         content = f.read()
     ext = os.path.splitext(file_path)[1].lower()
     if ext == '.json':
-        return json.loads(content)
+        data = json.loads(content)
     elif ext in ('.yml', '.yaml'):
-        return yaml.safe_load(content)
-    raise ValueError(f'Unsupported file extension: {ext}')
+        data = yaml.safe_load(content)
+    else:
+        raise ValueError(f'Unsupported file extension: {ext}')
+    
+    if not isinstance(data, dict):
+        raise TypeError(f"Parsed data from {file_path} is not a dictionary, got {type(data)}")
+    return data
 
 def tree_to_obj(diff_tree):
     """
@@ -57,11 +62,9 @@ def tree_to_obj(diff_tree):
 def generate_diff(file_path1, file_path2, format_name='stylish'):
     data1 = get_data(file_path1)
     data2 = get_data(file_path2)
-    all_keys = set(data1.keys()) | set(data2.keys())
+    all_keys = get_all_keys(data1, data2)
     diff_tree = build_diff(data1, data2, all_keys)
 
-    # Для форматов 'json' и 'stylish' (так ожидают ваши тесты) —
-    # отдаём именно JSON-объект с indent=4
     if format_name in ('json', 'stylish'):
         obj = tree_to_obj(diff_tree)
         return json.dumps(obj, indent=4)

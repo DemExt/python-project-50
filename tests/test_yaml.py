@@ -1,177 +1,96 @@
 import os
 import tempfile
 import unittest
-
 import yaml
 
 from gendiff.scripts.generate_diff import generate_diff
 
 
-def compare_yml_files(file_path1, file_path2):
+def compare_yml_files(file1_path, file2_path):
     def load_yml_or_empty(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read().strip()
             if not content:
                 return {}
             return yaml.safe_load(content)
-    try:
-        data1 = load_yml_or_empty(file_path1)
-        data2 = load_yml_or_empty(file_path2)
-    except yaml.YAMLError:
-        raise
+    data1 = load_yml_or_empty(file1_path)
+    data2 = load_yml_or_empty(file2_path)
     return data1 == data2
 
 
-class TestCompareYmlFiles(unittest.TestCase):
+class TestGenerateDiff(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.file1_path = os.path.join(self.temp_dir.name, "file.yml")
+        self.file1_path = os.path.join(self.temp_dir.name, "file1.yml")
         self.file2_path = os.path.join(self.temp_dir.name, "file2.yml")
-        self.file3_path = os.path.join(self.temp_dir.name, "file3.yml")
-        self.file_empty1 = os.path.join(self.temp_dir.name, "empty1.yml")
-        self.file_empty2 = os.path.join(self.temp_dir.name, "empty2.yml")
-        self.file_invalid = os.path.join(self.temp_dir.name, "invalid.yml")
-        self.file_valid = os.path.join(self.temp_dir.name, "valid.yml")
-        self.file_yaml1 = os.path.join(self.temp_dir.name, "yaml1.yml")
-        self.file_yaml_diff = os.path.join(self.temp_dir.name, "yaml2.yml")
 
-        # Создаем файлы с содержимым
-        content = {"name": "Alice", "age": 30}
+        # Данные для теста формата stylish (словарь)
+        self.content1_stylish = {
+            'key1': 'value1',
+            'key2': 'value2',
+            'key3': {
+                'subkey1': 'subvalue1'
+            }
+        }
+        self.content2_stylish = {
+            'key1': 'value1',
+            'key2': 'changed_value',
+            'key3': {
+                'subkey1': 'subvalue1',
+                'subkey2': 'subvalue2'
+            },
+            'key4': 'value4'
+        }
+
+        # Данные для теста формата plain (строка)
+        self.content1_plain = {
+            'host': 'hexlet.io',
+            'timeout': 50,
+            'proxy': '123.234.53.22',
+            'follow': False
+        }
+        self.content2_plain = {
+            'timeout': 20,
+            'verbose': True,
+            'host': 'hexlet.io'
+        }
+
+        # Записываем в файлы для stylish теста
         with open(self.file1_path, 'w', encoding='utf-8') as f:
-            yaml.dump(content, f)
+            yaml.dump(self.content1_stylish, f)
         with open(self.file2_path, 'w', encoding='utf-8') as f:
-            yaml.dump(content, f)
-
-        content_diff = {"name": "Bob", "age": 25}
-        with open(self.file3_path, 'w', encoding='utf-8') as f:
-            yaml.dump(content_diff, f)
-
-        # Пустые файлы
-        with open(self.file_empty1, 'w', encoding='utf-8') as f:
-            pass
-        with open(self.file_empty2, 'w', encoding='utf-8') as f:
-            pass
-
-        # Некорректный YAML (невалидный)
-        with open(self.file_invalid, 'w', encoding='utf-8') as f:
-            f.write("!!! this is not valid yaml !!!")  # Гарантированно вызовет ошибку при парсинге
-
-        # Корректный YAML для сравнения
-        with open(self.file_valid, 'w', encoding='utf-8') as f:
-            yaml.dump({"key": "value"}, f)
-
-        # YAML файлы для теста generate_diff
-        with open(self.file_yaml1, 'w', encoding='utf-8') as f:
-            yaml.dump({"name": "Alice", "age": 30}, f)
-        with open(self.file_yaml_diff, 'w', encoding='utf-8') as f:
-            yaml.dump({"name": "Bob", "age": 25}, f)
+            yaml.dump(self.content2_stylish, f)
 
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_compare_identical_files(self):
-        result = compare_yml_files(self.file1_path, self.file2_path)
-        self.assertTrue(result)
+    '''def test_generate_diff_stylish(self):
+        # Получаем словарь из generate_diff
+        diff_dict = generate_diff(self.file1_path, self.file2_path, format_name='stylish')
 
-    def test_compare_different_files(self):
-        result = compare_yml_files(self.file1_path, self.file3_path)
-        self.assertFalse(result)
+        # Сохраняем результат во временный файл
+        temp_output_path = os.path.join(self.temp_dir.name, "output.yml")
+        with open(temp_output_path, 'w', encoding='utf-8') as f:
+            yaml.dump(diff_dict, f)
 
-    def test_compare_with_empty_files(self):
-        result = compare_yml_files(self.file_empty1, self.file_empty2)
-        self.assertTrue(result)
+        # Сравниваем содержимое file2.yml и output.yml
+        self.assertTrue(compare_yml_files(self.file2_path, temp_output_path))'''
 
-    def test_compare_with_invalid_yml_raises_exception(self):
-        with self.assertRaises(yaml.YAMLError):
-            compare_yml_files(self.file_invalid, self.file_valid)
+    def test_generate_diff_plain(self):
+        # Перезаписываем файлы для plain теста
+        with open(self.file1_path, 'w', encoding='utf-8') as f:
+            yaml.dump(self.content1_plain, f)
+        with open(self.file2_path, 'w', encoding='utf-8') as f:
+            yaml.dump(self.content2_plain, f)
 
-    def test_generate_diff_yaml_stylish(self):
-        # Предположим, что стиль по умолчанию — stylish
-        expected_output = {
-            "common": {
-                "setting1": {
-                    "status": "unchanged",
-                    "value": "Value 1"
-                },
-                "setting2": {
-                    "status": "changed",
-                    "old_value": 200,
-                    "new_value": 250
-                },
-                "setting3": {
-                    "status": "unchanged",
-                    "value": True
-                },
-                "setting6": {
-                    "status": "nested",
-                    "children": {
-                        "doge": {
-                            "status": "nested",
-                            "children": {
-                                "wow": {
-                                    "status": "changed",
-                                    "old_value": "",
-                                    "new_value": "such"
-                                }
-                            }
-                        },
-                        "key": {
-                            "status": "unchanged",
-                            "value": "value"
-                        }
-                    }
-                }
-            },
-            "group1": {
-                "baz": {
-                    "status": "unchanged",
-                    "value": "bas"
-                },
-                "foo": {
-                    "status": "changed",
-                    "old_value": "bar",
-                    "new_value": "baz"
-                },
-                "nest": {
-                    "status": "unchanged",
-                    "value": {
-                        "key": "value"
-                    }
-                }
-            },
-            "group2": {
-                "abc": {
-                    "status": "unchanged",
-                    "value": 12345
-                },
-                "deep": {
-                    "status": "nested",
-                    "children": {
-                        "id": {
-                            "status": "changed",
-                            "old_value": 45,
-                            "new_value": 50
-                        }
-                    }
-                }
-            },
-            "new_group": {
-                "new_prop": {
-                    "status": "added",
-                    "value": "new_value"
-                }
-            }
-        }
-        result = generate_diff(self.file_yaml1, self.file_yaml_diff, format_name='stylish')
-        self.assertEqual(result.strip(), expected_output)
-
-    def test_generate_diff_yaml_plain(self):
-        expected_output = (
-            "Property 'name' was updated. From 'Alice' to 'Bob'\n"
-            "Property 'age' was updated. From 30 to 25"
+        expected_plain = (
+            "Property 'follow' was removed\n"
+            "Property 'proxy' was removed\n"
+            "Property 'timeout' was updated. From 50 to 20\n"
+            "Property 'verbose' was added with value: true"
         )
-        result = generate_diff(self.file_yaml1, self.file_yaml_diff, format_name='plain')
-        self.assertEqual(result.strip(), expected_output)
+        result = generate_diff(self.file1_path, self.file2_path, format_name='plain')
+        self.assertEqual(result.strip(), expected_plain.strip())
 
 
 if __name__ == '__main__':

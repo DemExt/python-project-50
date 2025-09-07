@@ -26,7 +26,8 @@ def build_diff(dict1, dict2, all_keys):
             # свойство удалено
             diff.append({
                 'key': key,
-                'status': 'removed'
+                'status': 'removed',
+                'value': dict1[key]
             })
         else:
             val1 = dict1[key]
@@ -46,5 +47,12 @@ def build_diff(dict1, dict2, all_keys):
                     'status': 'changed',
                     'old_value': old_value,
                     'new_value': new_value
+                })
+            else:
+                # значения равны
+                diff.append({
+                    'key': key,
+                    'status': 'unchanged',
+                    'value': '[complex value]' if isinstance(val1, dict) else val1
                 })
     return diff
