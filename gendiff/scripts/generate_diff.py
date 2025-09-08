@@ -1,7 +1,10 @@
 import json
 import os
+
 import yaml
+
 from .diff_builder import build_diff, get_all_keys
+
 
 def get_data(file_path):
     with open(file_path) as f:
@@ -17,6 +20,7 @@ def get_data(file_path):
     if not isinstance(data, dict):
         raise TypeError(f"Parsed data from {file_path} is not a dictionary, got {type(data)}")
     return data
+
 
 def tree_to_obj(diff_tree):
     """
@@ -59,6 +63,7 @@ def tree_to_obj(diff_tree):
             raise ValueError(f'Unknown status in diff tree: {status}')
     return result
 
+
 def generate_diff(file_path1, file_path2, format_name='stylish'):
     data1 = get_data(file_path1)
     data2 = get_data(file_path2)
@@ -79,6 +84,7 @@ def generate_diff(file_path1, file_path2, format_name='stylish'):
         return yaml_formatter.format_yaml(diff_tree)
     else:
         raise ValueError(f'Unknown format: {format_name}')
+
 
 def format_value(value):
     if isinstance(value, dict):

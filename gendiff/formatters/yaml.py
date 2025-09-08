@@ -26,6 +26,7 @@ def format_yaml(diff_tree, depth=0):
             lines.append(f"{indent}+ {key}: {new_value}")
     return '\n'.join(lines)
 
+
 def to_str(value, depth):
     """
     Преобразует значение в строку с учетом вложенности.

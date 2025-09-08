@@ -1,6 +1,7 @@
-import argparse        #точка входа, только argparse и вызов главной функции
+import argparse  # точка входа, только argparse и вызов главной функции
 
 from gendiff.scripts.diff_builder import build_diff, get_all_keys, read_file
+
 from .generate_diff import format_json, format_plain, format_stylish
 
 
