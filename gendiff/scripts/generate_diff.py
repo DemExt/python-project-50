@@ -29,33 +29,38 @@ def tree_to_obj(diff_tree):
     """
     result = {}
     for node in diff_tree:
-        key = node['key']
+        name = node['key']
         status = node['status']
 
         if status == 'nested':
-            result[key] = {
-                'status': 'nested',
+            result[name] = {
+                'action': 'nested',
+                'name': name,
                 'children': tree_to_obj(node['children'])
             }
-        elif status == 'changed':
-            result[key] = {
-                'status': 'changed',
+        elif status == 'modified':
+            result[name] = {
+                'action': 'modified',
+                'name': name,
                 'old_value': node['old_value'],
                 'new_value': node['new_value']
             }
         elif status == 'added':
-            result[key] = {
-                'status': 'added',
-                'value': node['value']
+            result[name] = {
+                'action': 'added',
+                'name': name,
+                'new_value': node['value']
             }
-        elif status == 'removed':
-            result[key] = {
-                'status': 'removed',
-                'value': node['value']
+        elif status == 'deleted':
+            result[name] = {
+                'action': 'deleted',
+                'name': name,
+                'value': node['old_value']
             }
         elif status == 'unchanged':
-            result[key] = {
-                'status': 'unchanged',
+            result[name] = {
+                'action': 'unchanged',
+                'name': name,
                 'value': node['value']
             }
         else:
@@ -101,33 +106,41 @@ def format_value(value):
 
 def format_stylish(diff, depth=0):
     lines = []
-    indent = "  " * depth
+
+    def get_indent(depth, sign=' '):
+        base = '  ' * depth
+        if sign in ('+', '-'):
+            return base[:-2] + sign + ' '
+        else:
+            return base + '  '
+
     for item in diff:
         key = item['key']
         status = item['status']
+
         if status == 'nested':
-            lines.append(f"{indent}  {key}: {format_stylish(item['children'], depth + 1)}")
+            children = format_stylish(item['children'], depth + 1)
+            lines.append(f"{get_indent(depth)}{key}: {children}")
         elif status == 'added':
-            value = item.get('value', '')
-            lines.append(f"{indent}+ {key}: {format_value(value)}")
+            value = item['value']
+            lines.append(f"{get_indent(depth, '+')}{key}: {format_value(value)}")
         elif status == 'removed':
-            value = item.get('value', '')
-            lines.append(f"{indent}- {key}: {format_value(value)}")
+            value = item['value']
+            lines.append(f"{get_indent(depth, '-')} {key}: {format_value(value)}".replace("-  ", "- "))
+            # Используем get_indent уже с двумя символами, корректировка печати
+            lines.append(f"{get_indent(depth, '-').strip()} {key}: {format_value(value)}")
         elif status == 'unchanged':
-            value = item.get('value', '')
-            lines.append(f"{indent}  {key}: {format_value(value)}")
+            value = item['value']
+            lines.append(f"{get_indent(depth)}{key}: {format_value(value)}")
         elif status == 'changed':
-            old_value = item.get('old_value', '')
-            new_value = item.get('new_value', '')
-            lines.append(f"{indent}- {key}: {format_value(old_value)}")
-            lines.append(f"{indent}+ {key}: {format_value(new_value)}")
-    # Обертка в фигурные скобки с правильными отступами
+            old_value = item['old_value']
+            new_value = item['new_value']
+            lines.append(f"{get_indent(depth, '-')} {key}: {format_value(old_value)}".replace("-  ", "- "))
+            lines.append(f"{get_indent(depth, '+')} {key}: {format_value(new_value)}".replace("+  ", "+ "))
     opening_brace = '{'
-    closing_brace = indent + '}'
-    if depth == 0:
-        return opening_brace + '\n' + '\n'.join(lines) + '\n' + closing_brace
-    else:
-        return '{\n' + '\n'.join(lines) + '\n' + indent + '}'
+    closing_brace = '  ' * depth + '}'
+
+    return f'{opening_brace}\n' + '\n'.join(lines) + f'\n{closing_brace}'
     
 
 def format_plain(diff):

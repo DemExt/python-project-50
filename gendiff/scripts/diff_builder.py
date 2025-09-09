@@ -24,10 +24,11 @@ def build_diff(dict1, dict2, all_keys):
             })
         elif key not in dict2:
             # свойство удалено
+            old_value = '[complex value]' if isinstance(val1, dict) else val1
             diff.append({
                 'key': key,
-                'status': 'removed',
-                'value': dict1[key]
+                'status': 'deleted',
+                'old_value': old_value
             })
         else:
             val1 = dict1[key]
@@ -44,7 +45,7 @@ def build_diff(dict1, dict2, all_keys):
                 new_value = '[complex value]' if isinstance(val2, dict) else val2
                 diff.append({
                     'key': key,
-                    'status': 'changed',
+                    'status': 'modified',
                     'old_value': old_value,
                     'new_value': new_value
                 })
