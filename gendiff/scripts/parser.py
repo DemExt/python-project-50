@@ -11,5 +11,7 @@ def read_file(filepath):
             return json.load(f)
         elif ext in ['.yml', '.yaml']:
             return yaml.safe_load(f)
+        elif ext == '.txt':
+            return f.read()
         else:
             raise ValueError(f"Unsupported file extension: {ext}")
