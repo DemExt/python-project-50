@@ -13,13 +13,13 @@ def format_yaml(diff_tree, depth=0):
         elif status == 'added':
             value = to_str(node['value'], depth + 1)
             lines.append(f"{indent}+ {key}: {value}")
-        elif status == 'removed':
+        elif status == 'deleted':
             value = to_str(node['value'], depth + 1)
             lines.append(f"{indent}- {key}: {value}")
         elif status == 'unchanged':
             value = to_str(node['value'], depth + 1)
             lines.append(f"{indent}  {key}: {value}")
-        elif status == 'changed':
+        elif status == 'modified':
             old_value = to_str(node['old_value'], depth + 1)
             new_value = to_str(node['new_value'], depth + 1)
             lines.append(f"{indent}- {key}: {old_value}")

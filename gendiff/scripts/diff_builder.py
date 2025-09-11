@@ -1,9 +1,14 @@
 import json
-
+import yaml
 
 def read_file(file_path):
-    with open(file_path, 'r') as f:
-        return json.load(f)
+    with open(file_path) as f:
+        if file_path.endswith('.json'):
+            return json.load(f)
+        elif file_path.endswith(('.yaml', '.yml')):
+            return yaml.safe_load(f)
+        else:
+            raise Exception('Unsupported format')
     
 
 def get_all_keys(dict1, dict2):
@@ -12,48 +17,44 @@ def get_all_keys(dict1, dict2):
 
 def build_diff(dict1, dict2, all_keys):
     diff = []
+    all_keys = get_all_keys(dict1, dict2)
 
     for key in all_keys:
         if key not in dict1:
-            # свойство добавлено
             val = dict2[key]
             diff.append({
-                'key': key,
-                'status': 'added',
-                'value': '[complex value]' if isinstance(val, dict) else val
+                'name': key,
+                'action': 'added',
+                'new_value': val
             })
         elif key not in dict2:
-            # свойство удалено
-            old_value = '[complex value]' if isinstance(val1, dict) else val1
+            val = dict1[key]
             diff.append({
-                'key': key,
-                'status': 'deleted',
-                'old_value': old_value
+                'name': key,
+                'action': 'deleted',
+                'old_value': val
             })
         else:
             val1 = dict1[key]
             val2 = dict2[key]
             if isinstance(val1, dict) and isinstance(val2, dict):
-                children = build_diff(val1, val2, get_all_keys(val1, val2))
+                children = build_diff(val1, val2, all_keys)
                 diff.append({
-                    'key': key,
-                    'status': 'nested',
+                    'name': key,
+                    'action': 'nested',
                     'children': children
                 })
             elif val1 != val2:
-                old_value = '[complex value]' if isinstance(val1, dict) else val1
-                new_value = '[complex value]' if isinstance(val2, dict) else val2
                 diff.append({
-                    'key': key,
-                    'status': 'modified',
-                    'old_value': old_value,
-                    'new_value': new_value
+                    'name': key,
+                    'action': 'modified',
+                    'old_value': val1,
+                    'new_value': val2
                 })
             else:
-                # значения равны
                 diff.append({
-                    'key': key,
-                    'status': 'unchanged',
-                    'value': '[complex value]' if isinstance(val1, dict) else val1
+                    'name': key,
+                    'action': 'unchanged',
+                    'value': val1
                 })
     return diff
