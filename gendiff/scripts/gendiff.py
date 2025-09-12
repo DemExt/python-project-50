@@ -2,7 +2,9 @@ import argparse  # точка входа, только argparse и вызов г
 
 from gendiff.scripts.diff_builder import build_diff, get_all_keys, read_file
 
-from .generate_diff import format_json, format_plain, format_stylish
+from ..formatters.json import format_diff_json
+from ..formatters.plain import format_plain
+from ..formatters.stylish import format_diff_stylish
 
 
 def main():
@@ -27,11 +29,11 @@ def main():
     diff = build_diff(data1 or {}, data2 or {}, all_keys)
 
     if args.format == 'stylish':
-        print(format_stylish(diff))
+        print(format_diff_stylish(diff))
     elif args.format == 'plain':
         print(format_plain(diff))
     elif args.format == 'json':
-        print(format_json(diff))
+        print(format_diff_json(diff))
 
 
 if __name__ == '__main__':

@@ -1,4 +1,15 @@
-from .format import format_value
+def format_value(value):
+    if isinstance(value, (dict, list)):
+        return '[complex value]'
+    elif value is None:
+        return 'null'
+    elif isinstance(value, bool):
+        return str(value).lower()
+    elif isinstance(value, str):
+        return f"'{value}'"
+    else:
+        return str(value)
+
 
 def format_plain(node_list):
     lines = []
@@ -20,12 +31,12 @@ def format_plain(node_list):
                 old_value = node.get('old_value')
                 if old_value is not None:
                     value_str = format_value(old_value)
-                    lines.append(f"Property '{current_path}' was removed. Old value: {value_str}")
+                    lines.append(f"Property '{current_path}' was removed")
                 else:
                     lines.append(f"Property '{current_path}' was removed")
             elif status == 'modified':
-                old_val = format_value(node['old_value'])
                 new_val = format_value(node['new_value'])
+                old_val = format_value(node['old_value'])
                 lines.append(f"Property '{current_path}' was updated. From {old_val} to {new_val}")
                 
     recurse(node_list)

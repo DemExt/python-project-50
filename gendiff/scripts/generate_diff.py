@@ -1,10 +1,12 @@
 import json
 import os
+
 import yaml
 
 from .diff_builder import build_diff, get_all_keys
-from ..formatters.format import format_value
-#from ..formatters.stylish import format_stylish
+
+# from ..formatters.stylish import format_stylish
+
 
 def get_data(file_path):
     with open(file_path) as f:
@@ -23,45 +25,45 @@ def get_data(file_path):
 
 
 def tree_to_obj(diff_tree):
-    result = {}
+    result = []
     for node in diff_tree:
         name = node['name']
         status = node['action']
 
         if status == 'nested':
-            result[name] = {
+            result.append({
                 'action': 'nested',
                 'name': name,
                 'children': tree_to_obj(node['children'])
-            }
+            })
         elif status == 'modified':
-            result[name] = {
+            result.append({
                 'action': 'modified',
                 'name': name,
-                'old_value': node['old_value'],
-                'new_value': node['new_value']
-            }
+                'new_value': node['new_value'],
+                'old_value': node['old_value']
+            })
         elif status == 'added':
             # в вашем build_diff для added — существует ключ 'value'
-            result[name] = {
+            result.append({
                 'action': 'added',
                 'name': name,
                 'new_value': node['new_value']
-            }
+            })
         elif status == 'deleted':
             # для deleted — ключ 'old_value', а не 'value'
-            result[name] = {
+            result.append({
                 'action': 'deleted',
                 'name': name,
                 'old_value': node['old_value']
-            }
+            })
         elif status == 'unchanged':
             # для unchanged — ключ 'value'
-            result[name] = {
+            result.append({
                 'action': 'unchanged',
                 'name': name,
                 'value': node['value']
-            }
+            })
         else:
             raise ValueError(f'Unknown status in diff tree: {status}')
     return result
@@ -70,15 +72,15 @@ def tree_to_obj(diff_tree):
 def generate_diff(file_path1, file_path2, format_name='stylish'):
     data1 = get_data(file_path1)
     data2 = get_data(file_path2)
-    all_keys = get_all_keys(data1, data2)
-    diff_tree = build_diff(data1, data2, all_keys)
+    #all_keys = get_all_keys(data1, data2)
+    diff_tree = build_diff(data1, data2)
 
     if format_name == 'json':
         obj = tree_to_obj(diff_tree)
         return json.dumps(obj, indent=4)
     elif format_name == 'stylish':
         from gendiff.formatters import stylish as stylish_formatter
-        return stylish_formatter.format_stylish(diff_tree)
+        return stylish_formatter.format_diff_stylish(diff_tree)
     elif format_name == 'plain':
         from gendiff.formatters import plain as plain_formatter
         return plain_formatter.format_plain(diff_tree)
