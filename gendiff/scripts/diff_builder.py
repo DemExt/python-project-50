@@ -1,18 +1,3 @@
-import json
-
-import yaml
-
-
-#def read_file(file_path):
- #   with open(file_path) as f:
- #       if file_path.endswith('.json'):
- #           return json.load(f)
- #       elif file_path.endswith(('.yaml', '.yml')):
- #           return yaml.safe_load(f)
- #       else:
-  #          raise Exception('Unsupported format')
-    
-
 def get_all_keys(dict1, dict2):
     return sorted(set(dict1.keys()) | set(dict2.keys()))
 

@@ -1,10 +1,6 @@
 import argparse  # точка входа, только argparse и вызов главной функции
-from gendiff.scripts.generate_diff import generate_diff
-#from gendiff.scripts.diff_builder import build_diff, get_all_keys, read_file
 
-#from ..formatters.json import format_diff_json
-#from ..formatters.plain import format_plain
-#from ..formatters.stylish import format_diff_stylish
+from gendiff.scripts.generate_diff import generate_diff
 
 
 def main():
@@ -26,20 +22,6 @@ def main():
 
     result = generate_diff(file_path1, file_path2, formatter=args.format)
     print(result)
-
-    #data1 = read_file(args.first_file)
-    #data2 = read_file(args.second_file)
-
-    #all_keys = get_all_keys(data1, data2)
-
-    #diff = build_diff(data1 or {}, data2 or {}, all_keys)
-
-    #if args.format == 'stylish':
-     #   print(format_diff_stylish(diff))
-    #elif args.format == 'plain':
-    #    print(format_plain(diff))
-    #elif args.format == 'json':
-    #    print(format_diff_json(diff))
 
 
 if __name__ == '__main__':
