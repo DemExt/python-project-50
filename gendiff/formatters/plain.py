@@ -39,7 +39,8 @@ def format_plain(node_list):
                 new_val = format_value(node['new_value'])
                 old_val = format_value(node['old_value'])
                 lines.append(
-                f"Property '{current_path}' was updated. From {old_val} to {new_val}")
+                f"Property '{current_path}' was updated. \
+From {old_val} to {new_val}")
                 
     recurse(node_list)
     return '\n'.join(lines)
