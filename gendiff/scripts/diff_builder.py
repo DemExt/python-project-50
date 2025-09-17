@@ -25,7 +25,7 @@ def build_diff(dict1, dict2):
             val1 = dict1[key]
             val2 = dict2[key]
             if isinstance(val1, dict) and isinstance(val2, dict):
-                children = build_diff(val1, val2)  # ключи вычисляются заново для вложенных словарей
+                children = build_diff(val1, val2)
                 diff.append({
                     'action': 'nested',
                     'name': key,

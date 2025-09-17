@@ -25,7 +25,8 @@ def format_plain(node_list):
             elif status == 'added':
                 # Используем 'new_value'
                 value_str = format_value(node['new_value'])
-                lines.append(f"Property '{current_path}' was added with value: {value_str}")
+                lines.append(
+                f"Property '{current_path}' was added with value: {value_str}")
             elif status == 'deleted':
                 # Возможно, есть 'old_value'
                 old_value = node.get('old_value')
@@ -37,7 +38,8 @@ def format_plain(node_list):
             elif status == 'modified':
                 new_val = format_value(node['new_value'])
                 old_val = format_value(node['old_value'])
-                lines.append(f"Property '{current_path}' was updated. From {old_val} to {new_val}")
+                lines.append(
+                f"Property '{current_path}' was updated. From {old_val} to {new_val}")
                 
     recurse(node_list)
     return '\n'.join(lines)
