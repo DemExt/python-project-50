@@ -31,7 +31,7 @@ def build_diff(dict1, dict2):
                     'name': key,
                     'children': children
                 })
-            elif val1 != val2:
+            elif val2 != val1:
                 diff.append({
                     'action': 'modified',
                     'name': key,
